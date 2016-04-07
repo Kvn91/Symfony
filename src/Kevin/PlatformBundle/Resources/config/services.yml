@@ -1,0 +1,4 @@
+services:
+    kevin_platform.antispam:
+        class:     Kevin\PlatformBundle\Antispam\OCAntispam
+        arguments: ['@mailer', %locale%, 50]

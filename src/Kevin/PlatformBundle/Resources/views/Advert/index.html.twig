@@ -1,0 +1,22 @@
+{% extends "KevinPlatformBundle::layout.html.twig" %}
+
+{% block title %}
+
+    Accueil - {{ parent() }}
+
+{% endblock %}
+
+{% block kevinplatform_body %}
+
+    <h2>Liste des annonces</h2>
+    <ul>
+    {% for advert in advertsList %}
+        <li>
+            <a href="{{ path('kevin_platform_view', {'id' : advert.id}) }}">{{ advert.title }}</a>
+            par {{ advert.author }} le {{ advert.date|date('d/M/y') }}
+        </li>
+    {% else %}
+        <p>Aucune annonce à afficher</p>
+    {% endfor %}
+    </ul>
+{% endblock %}

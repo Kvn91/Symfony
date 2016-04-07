@@ -1,0 +1,43 @@
+{% extends "KevinPlatformBundle::layout.html.twig" %}
+
+{% block kevinplatform_body %}
+
+    {% if advert.image is not null %}
+        <img src="{{ advert.image.url }}" alt="{{ advert.image.alt }}">
+    {% endif %}
+    <h2>{{ advert.title }}</h2>
+    <i>Par {{ advert.author }}, le {{ advert.date|date('d/m/Y') }}</i>
+
+
+    <div class="well">
+        {{ advert.content }}
+    </div>
+
+    <h3>Applications :</h3>
+    <div class="well">
+        <ul>
+        {% for application in applicationsList %}
+            <li>
+                <p>Auteur : {{ application.author }}</p>
+                <p>{{ application.content }}</p>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+
+    <p>
+        <a href="{{ path('kevin_platform_home') }}" class="btn btn-default">
+            <i class="glyphicon glyphicon-chevron-left"></i>
+            Retour à la liste
+        </a>
+        <a href="{{ path('kevin_platform_edit', {'id': advert.id}) }}" class="btn btn-default">
+            <i class="glyphicon glyphicon-edit"></i>
+            Modifier l'annonce
+        </a>
+        <a href="{{ path('kevin_platform_delete', {'id': advert.id}) }}" class="btn btn-danger">
+            <i class="glyphicon glyphicon-trash"></i>
+            Supprimer l'annonce
+        </a>
+    </p>
+
+{% endblock %}
