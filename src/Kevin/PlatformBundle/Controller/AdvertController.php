@@ -5,6 +5,7 @@
 namespace Kevin\PlatformBundle\Controller;
 
 use Kevin\PlatformBundle\Entity\Advert;
+use Kevin\PlatformBundle\Entity\AdvertSkill;
 use Kevin\PlatformBundle\Entity\Image;
 use Kevin\PlatformBundle\Entity\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -38,17 +39,21 @@ class AdvertController extends Controller
             throw new NotFoundHttpException("L'annonce n'existe pas");
         }
 
-        $applicationsRep = $em->getRepository('KevinPlatformBundle:Application');
-        $applicationsList = $applicationsRep->findBy(['advert' => $advert]);
+        $applicationsList = $em->getRepository('KevinPlatformBundle:Application')->findBy(['advert' => $advert]);
+
+        $advertSkillsList = $em->getRepository('KevinPlatformBundle:AdvertSkill')->findBy(['advert' => $advert]);
 
         return $this->render('KevinPlatformBundle:Advert:view.html.twig', [
-            'advert' => $advert,
-            'applicationsList' => $applicationsList
+            'advert'            => $advert,
+            'applicationsList'  => $applicationsList,
+            'advertSkillsList'  => $advertSkillsList
         ]);
     }
 
     public function addAction(Request $request)
     {
+        $em = $this->getDoctrine()->getManager();
+
         // Créer une annonce
         $advert = new Advert;
         $advert->setAuthor('Kevin')
@@ -78,7 +83,17 @@ class AdvertController extends Controller
         $application1->setAdvert($advert);
         $application2->setAdvert($advert);
 
-        $em = $this->getDoctrine()->getManager();
+        $skillsList = $em->getRepository('KevinPlatformBundle:Skill')->findAll();
+
+        foreach ($skillsList as $skill) {
+            $advertSkill = new AdvertSkill();
+
+            $advertSkill->setAdvert($advert);
+            $advertSkill->setSkill($skill);
+            $advertSkill->setLevel('Expert');
+
+            $em->persist($advertSkill);
+        }
 
         $em->persist($advert);
         $em->persist($application1);

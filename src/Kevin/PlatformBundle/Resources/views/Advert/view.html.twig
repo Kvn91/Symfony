@@ -21,18 +21,32 @@
             {% endfor %}
         </p>
     {% endif %}
-    
-    <h3>Applications :</h3>
-    <div class="well">
-        <ul>
-        {% for application in applicationsList %}
-            <li>
-                <p>Auteur : {{ application.author }}</p>
-                <p>{{ application.content }}</p>
-            </li>
-        {% endfor %}
-        </ul>
-    </div>
+
+    {% if advertSkillsList|length > 0 %}
+        <div>
+            Cette annonce requiert les compétences suivantes :
+            <ul>
+                {% for advertSkill in advertSkillsList %}
+                    <li>{{ advertSkill.skill.name }} : niveau {{ advertSkill.level }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if applicationsList|length > 0 %}
+        <h3>Applications :</h3>
+        <div class="well">
+            <ul>
+                {% for application in applicationsList %}
+                    <li>
+                        <p>Auteur : {{ application.author }}</p>
+                        <p>{{ application.content }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {%  endif %}
+
 
     <p>
         <a href="{{ path('kevin_platform_home') }}" class="btn btn-default">
