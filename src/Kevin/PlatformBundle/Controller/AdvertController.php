@@ -66,7 +66,6 @@ class AdvertController extends Controller
         $image = new Image();
         $image->setUrl('http://sdz-upload.s3.amazonaws.com/prod/upload/job-de-reve.jpg')
                 ->setAlt('Job de rêve');
-
         $advert->setImage($image);
 
         // Création d'une candidature
