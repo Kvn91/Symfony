@@ -19,9 +19,12 @@ class AdvertController extends Controller
             throw new NotFoundHttpException('Page "'.$page.'" inexistante.');
         }
 
-        $doctrine = $this->getDoctrine();
+        $em = $this->getDoctrine()->getManager();
+        $advertsRep = $em->getRepository('KevinPlatformBundle:Advert');
 
-//        return $this->render('KevinPlatformBundle:Advert:index.html.twig', ['advertsList' => $advertsList]);
+        $advertsList = $advertsRep->findAll();
+
+        return $this->render('KevinPlatformBundle:Advert:index.html.twig', ['advertsList' => $advertsList]);
     }
 
     public function viewAction($id)
@@ -96,16 +99,27 @@ class AdvertController extends Controller
 
     public function editAction($id, Request $request)
     {
-        $advert = array(
-            'title'   => 'Recherche développpeur Symfony2',
-            'id'      => $id,
-            'author'  => 'Alexandre',
-            'content' => 'Nous recherchons un développeur Symfony2 débutant sur Lyon. Blabla…',
-            'date'    => new \Datetime()
-        );
+        $em             = $this->getDoctrine()->getManager();
+        $advertsRep     = $em->getRepository('KevinPlatformBundle:Advert');
+        $categoriesRep  = $em->getRepository('KevinPlatformBundle:Category');
+
+        $advert = $advertsRep->find($id);
+
+        if(null === $advert){
+            throw new NotFoundHttpException("L'annonce n'existe pas");
+        }
+
+        $categoriesList = $categoriesRep->findAll();
+
+        if(null !== $categoriesList){
+            foreach ($categoriesList as $category){
+                $advert->addCategory($category);
+            }
+        }
+
+        $em->flush();
 
         if($request->isMethod('POST')){
-//            Gestion de la modification d'annonce
 
             $request->getSession()->getFlashBag()->add('notice', 'Annonce modifiée !');
             return $this->redirectToRoute('kevin_platform_view', ['id' => $id]);
@@ -116,6 +130,11 @@ class AdvertController extends Controller
 
     public function deleteAction($id, Request $request)
     {
+        $em             = $this->getDoctrine()->getManager();
+        $advertsRep     = $em->getRepository('KevinPlatformBundle:Advert');
+
+        $advert = $advertsRep->find($id);
+
         if($request->isMethod('POST')){
 //            Gestion de la suppression d'annonce
 
@@ -128,10 +147,10 @@ class AdvertController extends Controller
 
     public function menuAction($limit)
     {
-        $advertsList = [['id' => 1, 'title' => 'Annonce 1'],
-                        ['id' => 2, 'title' => 'Annonce 2'],
-                        ['id' => 3, 'title' => 'Annonce 3']
-                        ];
+        $em = $this->getDoctrine()->getManager();
+        $advertsRep = $em->getRepository('KevinPlatformBundle:Advert');
+
+        $advertsList = $advertsRep->findAll();
 
         return $this->render('KevinPlatformBundle:Advert:menu.html.twig', ['advertsList' => $advertsList]);
     }
