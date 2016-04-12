@@ -24,6 +24,11 @@ class Advert
     private $image;
 
     /**
+     * @ORM\OneToMany(targetEntity="Kevin\PlatformBundle\Entity\Application", mappedBy="advert")
+     */
+    private $applications;
+
+    /**
      * @var int
      *
      * @ORM\Column(name="id", type="integer")
@@ -224,6 +229,7 @@ class Advert
     public function __construct()
     {
         $this->categories = new ArrayCollection();
+        $this->applications = new ArrayCollection();
     }
 
     /**
@@ -258,5 +264,41 @@ class Advert
     public function getCategories()
     {
         return $this->categories;
+    }
+
+    /**
+     * Add application
+     *
+     * @param \Kevin\PlatformBundle\Entity\Application $application
+     *
+     * @return Advert
+     */
+    public function addApplication(\Kevin\PlatformBundle\Entity\Application $application)
+    {
+        $this->applications[] = $application;
+
+        $application->setAdvert($this);
+
+        return $this;
+    }
+
+    /**
+     * Remove application
+     *
+     * @param \Kevin\PlatformBundle\Entity\Application $application
+     */
+    public function removeApplication(\Kevin\PlatformBundle\Entity\Application $application)
+    {
+        $this->applications->removeElement($application);
+    }
+
+    /**
+     * Get applications
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getApplications()
+    {
+        return $this->applications;
     }
 }
