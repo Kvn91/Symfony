@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  *
  * @ORM\Table(name="advert")
  * @ORM\Entity(repositoryClass="Kevin\PlatformBundle\Repository\AdvertRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Advert
 {
@@ -69,6 +70,13 @@ class Advert
      * @ORM\Column(name="published", type="boolean")
      */
     private $published = true;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="updatedAt", type="datetime", nullable=true)
+     */
+    private $updatedAt;
 
     /**
      * Get id
@@ -241,7 +249,9 @@ class Advert
      */
     public function addCategory(\Kevin\PlatformBundle\Entity\Category $category)
     {
-        $this->categories[] = $category;
+        if(!$this->categories->contains($category)){
+            $this->categories[] = $category;
+        }
 
         return $this;
     }
@@ -301,4 +311,36 @@ class Advert
     {
         return $this->applications;
     }
+
+    /**
+     * Set updatedAt
+     *
+     * @param \DateTime $updatedAt
+     *
+     * @return Advert
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get updatedAt
+     *
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+   public function updateDate()
+   {
+        $this->setUpdatedAt(new \DateTime());
+   }
 }

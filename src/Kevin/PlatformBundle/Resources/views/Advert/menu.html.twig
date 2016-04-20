@@ -1,7 +1,16 @@
+<h4>Dernières annonces</h4>
 <ul class="nav nav-pills nav-stacked">
-{% for advert in advertsList %}
-<li>
-    <a href="{{ path('kevin_platform_view', {'id' : advert.id}) }}">{{ advert.title }}</a>
-</li>
-{% endfor %}
+    {% for advert in advertsList %}
+        <li>
+            <a href="{{ path('kevin_platform_view', {'id' : advert.id}) }}">{{ advert.title }}</a>
+        </li>
+    {% endfor %}
+</ul>
+<h4>Dernières applications</h4>
+<ul class="nav nav-pills nav-stacked">
+    {% for application in applicationsList %}
+        <li>
+            <a href="{{ path('kevin_platform_view', {'id' : application.advert.id}) }}">{{ application.author }}</a>
+        </li>
+    {% endfor %}
 </ul>

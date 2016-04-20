@@ -25,7 +25,6 @@
                 <li><a href="{{ path('kevin_platform_add') }}">Ajouter une annonce</a></li>
             </ul>
 
-            <h4>Dernières annonces</h4>
             {{ render(controller("KevinPlatformBundle:Advert:menu", {'limit': 3})) }}
         </div>
         <div id="content" class="col-md-9">

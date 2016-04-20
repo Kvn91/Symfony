@@ -162,10 +162,10 @@ class AdvertController extends Controller
     public function menuAction($limit)
     {
         $em = $this->getDoctrine()->getManager();
-        $advertsRep = $em->getRepository('KevinPlatformBundle:Advert');
 
-        $advertsList = $advertsRep->findAll();
+        $advertsList = $em->getRepository('KevinPlatformBundle:Advert')->findAll();
+        $applicationsList = $em->getRepository('KevinPlatformBundle:Application')->getApplicationsWithAdvert(3);
 
-        return $this->render('KevinPlatformBundle:Advert:menu.html.twig', ['advertsList' => $advertsList]);
+        return $this->render('KevinPlatformBundle:Advert:menu.html.twig', ['advertsList' => $advertsList, 'applicationsList' => $applicationsList]);
     }
 }

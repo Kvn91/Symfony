@@ -5,7 +5,7 @@ namespace Kevin\PlatformBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="Kevin\PlatformBundle\Entity\AdvertSkillRepository")
+ * @ORM\Entity(repositoryClass="Kevin\PlatformBundle\Repository\AdvertSkillRepository")
  */
 class AdvertSkill
 {
