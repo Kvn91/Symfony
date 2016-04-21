@@ -79,6 +79,13 @@ class Advert
     private $updatedAt;
 
     /**
+     * @var int
+     *
+     * @ORM\Column(name="nbApplications", type="integer")
+     */
+    private $nbApplications = 0;
+
+    /**
      * Get id
      *
      * @return int
@@ -343,4 +350,14 @@ class Advert
    {
         $this->setUpdatedAt(new \DateTime());
    }
+
+    public function increaseApplication()
+    {
+        $this->nbApplications++;
+    }
+
+    public function decreaseApplication()
+    {
+        $this->nbApplications--;
+    }
 }
