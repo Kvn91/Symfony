@@ -9,6 +9,7 @@ use Kevin\PlatformBundle\Entity\AdvertSkill;
 use Kevin\PlatformBundle\Entity\Image;
 use Kevin\PlatformBundle\Entity\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -167,5 +168,21 @@ class AdvertController extends Controller
         $applicationsList = $em->getRepository('KevinPlatformBundle:Application')->getApplicationsWithAdvert(3);
 
         return $this->render('KevinPlatformBundle:Advert:menu.html.twig', ['advertsList' => $advertsList, 'applicationsList' => $applicationsList]);
+    }
+
+    public function testAction()
+    {
+        $advert = new Advert();
+        $advert->setAuthor('kev');
+        $advert->setContent('azuioher azrhpmho');
+        $advert->setTitle('Un titre de annonce !');
+        $advert->setDate(new \Datetime);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $em->persist($advert);
+        $em->flush();
+
+        return new Response('Slug généré : '.$advert->getSlug());
     }
 }

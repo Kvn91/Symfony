@@ -42,3 +42,8 @@ kevin_platform_view_slug:
     requirements:
         year: \d{4}
         _format: html|xml
+
+kevin_platform_test:
+    path:    /test
+    defaults:
+        _controller: KevinPlatformBundle:Advert:test
