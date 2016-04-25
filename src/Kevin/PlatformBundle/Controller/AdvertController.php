@@ -22,27 +22,33 @@ class AdvertController extends Controller
         }
 
         $em = $this->getDoctrine()->getManager();
-        $advertsRep = $em->getRepository('KevinPlatformBundle:Advert');
+        $advertsList = $em->getRepository('KevinPlatformBundle:Advert')->getAdverts($page);
 
-        $advertsList = $advertsRep->findAll();
+        $nbPages = ceil(count($advertsList)/advert::NB_ADVERTS_PER_PAGE);
 
-        return $this->render('KevinPlatformBundle:Advert:index.html.twig', ['advertsList' => $advertsList]);
+        if($page > $nbPages){
+            throw new NotFoundHttpException('Page "'.$page.'" inexistante.');
+        }
+
+        return $this->render('KevinPlatformBundle:Advert:index.html.twig', [
+            'advertsList' => $advertsList,
+            'page' => $page,
+            'nbPages' => $nbPages
+        ]);
     }
 
     public function viewAction($id)
     {
         $em = $this->getDoctrine()->getManager();
 
-        $advertsRep = $em->getRepository('KevinPlatformBundle:Advert');
-        $advert = $advertsRep->find($id);
+        $advert = $em->getRepository('KevinPlatformBundle:Advert')->find($id);
 
         if(null === $advert){
             throw new NotFoundHttpException("L'annonce n'existe pas");
         }
 
-        $applicationsList = $em->getRepository('KevinPlatformBundle:Application')->findBy(['advert' => $advert]);
-
-        $advertSkillsList = $em->getRepository('KevinPlatformBundle:AdvertSkill')->findBy(['advert' => $advert]);
+        $applicationsList = $em->getRepository('KevinPlatformBundle:Application')->findByAdvert($advert);
+        $advertSkillsList = $em->getRepository('KevinPlatformBundle:AdvertSkill')->findByAdvert($advert);
 
         return $this->render('KevinPlatformBundle:Advert:view.html.twig', [
             'advert'            => $advert,
@@ -55,100 +61,40 @@ class AdvertController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        // Créer une annonce
-        $advert = new Advert;
-        $advert->setAuthor('Kevin')
-            ->setContent('blabla')
-            ->setDate(new \DateTime)
-            ->setPublished(0)
-            ->setTitle('Hello Title 2');
-
-        // Créer une image
-        $image = new Image();
-        $image->setUrl('http://sdz-upload.s3.amazonaws.com/prod/upload/job-de-reve.jpg')
-                ->setAlt('Job de rêve');
-        $advert->setImage($image);
-
-        // Création d'une candidature
-        $application1 = new Application();
-        $application1->setAuthor('Marine');
-        $application1->setContent("J'ai toutes les qualités requises.");
-
-        // Création d'une deuxième candidature
-        $application2 = new Application();
-        $application2->setAuthor('Pierre');
-        $application2->setContent("Je suis très motivé.");
-
-        // Lier les candidatures à l'annonce
-        $application1->setAdvert($advert);
-        $application2->setAdvert($advert);
-
-        $skillsList = $em->getRepository('KevinPlatformBundle:Skill')->findAll();
-
-        foreach ($skillsList as $skill) {
-            $advertSkill = new AdvertSkill();
-
-            $advertSkill->setAdvert($advert);
-            $advertSkill->setSkill($skill);
-            $advertSkill->setLevel('Expert');
-
-            $em->persist($advertSkill);
-        }
-
-        $em->persist($advert);
-        $em->persist($application1);
-        $em->persist($application2);
-
-        $em->flush();
-
         if($request->isMethod('POST')){
 //            gestion du formulaire
 
-            $id = 5;
             $request->getSession()->getFlashBag()->add('notice', 'Annonce enregistrée !');
             return $this->redirectToRoute('kevin_platform_view', ['id' => $id]);
         }
-
         return $this->render('KevinPlatformBundle:Advert:add.html.twig');
     }
 
     public function editAction($id, Request $request)
     {
-        $em             = $this->getDoctrine()->getManager();
-        $advertsRep     = $em->getRepository('KevinPlatformBundle:Advert');
-        $categoriesRep  = $em->getRepository('KevinPlatformBundle:Category');
+        $em                 = $this->getDoctrine()->getManager();
 
-        $advert = $advertsRep->find($id);
-
+        $advert             = $em->getRepository('KevinPlatformBundle:Advert')->find($id);
         if(null === $advert){
             throw new NotFoundHttpException("L'annonce n'existe pas");
         }
-
-        $categoriesList = $categoriesRep->findAll();
-
-        if(null !== $categoriesList){
-            foreach ($categoriesList as $category){
-                $advert->addCategory($category);
-            }
-        }
-
-        $em->flush();
 
         if($request->isMethod('POST')){
 
             $request->getSession()->getFlashBag()->add('notice', 'Annonce modifiée !');
             return $this->redirectToRoute('kevin_platform_view', ['id' => $id]);
         }
-
         return $this->render('KevinPlatformBundle:Advert:edit.html.twig', ['advert' => $advert]);
     }
 
     public function deleteAction($id, Request $request)
     {
         $em             = $this->getDoctrine()->getManager();
-        $advertsRep     = $em->getRepository('KevinPlatformBundle:Advert');
+        $advert         = $em->getRepository('KevinPlatformBundle:Advert')->find($id);
 
-        $advert = $advertsRep->find($id);
+        if(null === $advert){
+            throw new NotFoundHttpException("L'annonce n'existe pas");
+        }
 
         if($request->isMethod('POST')){
 //            Gestion de la suppression d'annonce
@@ -156,33 +102,16 @@ class AdvertController extends Controller
             $request->getSession()->getFlashBag()->add('notice', 'Annonce supprimée !');
             return $this->redirectToRoute('kevin_platform_home');
         }
-
-        $this->render('KevinPlatformBundle:Advert:delete.html.twig');
+        $this->render('KevinPlatformBundle:Advert:delete.html.twig', ['advert' => $advert]);
     }
 
     public function menuAction($limit)
     {
         $em = $this->getDoctrine()->getManager();
 
-        $advertsList = $em->getRepository('KevinPlatformBundle:Advert')->findAll();
-        $applicationsList = $em->getRepository('KevinPlatformBundle:Application')->getApplicationsWithAdvert(3);
+        $advertsList        = $em->getRepository('KevinPlatformBundle:Advert')->findBy([], ['date' => 'desc'], $limit, 0);
+        $applicationsList   = $em->getRepository('KevinPlatformBundle:Application')->getApplicationsWithAdvert($limit);
 
         return $this->render('KevinPlatformBundle:Advert:menu.html.twig', ['advertsList' => $advertsList, 'applicationsList' => $applicationsList]);
-    }
-
-    public function testAction()
-    {
-        $advert = new Advert();
-        $advert->setAuthor('kev');
-        $advert->setContent('azuioher azrhpmho');
-        $advert->setTitle('Un titre de annonce !');
-        $advert->setDate(new \Datetime);
-
-        $em = $this->getDoctrine()->getManager();
-
-        $em->persist($advert);
-        $em->flush();
-
-        return new Response('Slug généré : '.$advert->getSlug());
     }
 }

@@ -15,6 +15,8 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class Advert
 {
+    const NB_ADVERTS_PER_PAGE = 3;
+
     /**
      * @ORM\ManyToMany(targetEntity="Kevin\PlatformBundle\Entity\Category", cascade={"persist"})
      */
@@ -29,6 +31,11 @@ class Advert
      * @ORM\OneToMany(targetEntity="Kevin\PlatformBundle\Entity\Application", mappedBy="advert")
      */
     private $applications;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Kevin\PlatformBundle\Entity\AdvertSkill", mappedBy="advert")
+     */
+    private $advertSkills;
 
     /**
      * @var int
@@ -250,7 +257,8 @@ class Advert
      */
     public function __construct()
     {
-        $this->categories = new ArrayCollection();
+        $this->date         = new \Datetime();
+        $this->categories   = new ArrayCollection();
         $this->applications = new ArrayCollection();
     }
 
@@ -414,5 +422,41 @@ class Advert
     public function getSlug()
     {
         return $this->slug;
+    }
+
+    /**
+     * Add advertSkill
+     *
+     * @param \Kevin\PlatformBundle\Entity\Application $advertSkill
+     *
+     * @return Advert
+     */
+    public function addAdvertSkill(\Kevin\PlatformBundle\Entity\Application $advertSkill)
+    {
+        $this->advertSkills[] = $advertSkill;
+
+        $advertSkill->setAdvert($advertSkill);
+
+        return $this;
+    }
+
+    /**
+     * Remove advertSkill
+     *
+     * @param \Kevin\PlatformBundle\Entity\Application $advertSkill
+     */
+    public function removeAdvertSkill(\Kevin\PlatformBundle\Entity\Application $advertSkill)
+    {
+        $this->advertSkills->removeElement($advertSkill);
+    }
+
+    /**
+     * Get advertSkills
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getAdvertSkills()
+    {
+        return $this->advertSkills;
     }
 }

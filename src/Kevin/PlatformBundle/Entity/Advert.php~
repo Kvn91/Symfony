@@ -31,6 +31,11 @@ class Advert
     private $applications;
 
     /**
+     * @ORM\OneToMany(targetEntity="Kevin\PlatformBundle\Entity\Application", mappedBy="advertSkill")
+     */
+    private $advertSkills;
+
+    /**
      * @var int
      *
      * @ORM\Column(name="id", type="integer")
@@ -250,7 +255,8 @@ class Advert
      */
     public function __construct()
     {
-        $this->categories = new ArrayCollection();
+        $this->date         = new \Datetime();
+        $this->categories   = new ArrayCollection();
         $this->applications = new ArrayCollection();
     }
 
@@ -390,5 +396,29 @@ class Advert
     public function getNbApplications()
     {
         return $this->nbApplications;
+    }
+
+    /**
+     * Set slug
+     *
+     * @param string $slug
+     *
+     * @return Advert
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * Get slug
+     *
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->slug;
     }
 }

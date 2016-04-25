@@ -1,6 +1,8 @@
 <?php
 
 namespace Kevin\PlatformBundle\Repository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Kevin\PlatformBundle\Entity\Advert;
 
 /**
  * AdvertRepository
@@ -10,13 +12,22 @@ namespace Kevin\PlatformBundle\Repository;
  */
 class AdvertRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function getAdvertWithCategories(array $categoryNames){
-        $qb = $this->createQueryBuilder(a)
+    public function getAdverts($page)
+    {
+        $query = $this->createQueryBuilder('a')
+            ->leftJoin('a.image', 'i')
+            ->addSelect('i')
             ->leftJoin('a.categories', 'c')
-            ->addSelect('c');
+            ->addSelect('c')
+            ->leftJoin('a.advertSkills', 'ads')
+            ->addSelect('ads')
+            ->orderBy('a.date', 'DESC')
+            ->getQuery()
+        ;
 
-        $qb->where($qb->expr()->in('c.name', $categoryNames));
+        $query->setFirstResult(($page-1) * advert::NB_ADVERTS_PER_PAGE)
+            ->setMaxResults(advert::NB_ADVERTS_PER_PAGE);
 
-        return $qb->getQuery()->getResult();
+        return new Paginator($query, true);
     }
 }
