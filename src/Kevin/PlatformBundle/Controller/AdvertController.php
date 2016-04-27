@@ -8,10 +8,17 @@ use Kevin\PlatformBundle\Entity\Advert;
 use Kevin\PlatformBundle\Entity\AdvertSkill;
 use Kevin\PlatformBundle\Entity\Image;
 use Kevin\PlatformBundle\Entity\Application;
+use Kevin\PlatformBundle\Form\AdvertType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class AdvertController extends Controller
 {
@@ -59,15 +66,35 @@ class AdvertController extends Controller
 
     public function addAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $advert = new Advert();
 
-        if($request->isMethod('POST')){
-//            gestion du formulaire
+        $form = $this->get('form.factory')->createBuilder(FormType::class, $advert)
+            ->add('date',      DateType::class)
+            ->add('title',     TextType::class)
+            ->add('content',   TextareaType::class)
+            ->add('author',    TextType::class)
+            ->add('published', CheckboxType::class, array('required' => false))
+            ->add('save',      SubmitType::class)
+            ->getForm()
+        ;
 
-            $request->getSession()->getFlashBag()->add('notice', 'Annonce enregistrée !');
-            return $this->redirectToRoute('kevin_platform_view', ['id' => $id]);
+        if ($request->isMethod('POST')) {
+            $form->handleRequest($request);
+
+            if ($form->isValid()) {
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($advert);
+                $em->flush();
+
+                $request->getSession()->getFlashBag()->add('notice', 'Annonce bien enregistrée.');
+
+                return $this->redirectToRoute('kevin_platform_view', array('id' => $advert->getId()));
+            }
         }
-        return $this->render('KevinPlatformBundle:Advert:add.html.twig');
+
+        return $this->render('KevinPlatformBundle:Advert:add.html.twig', array(
+            'form' => $form->createView(),
+        ));
     }
 
     public function editAction($id, Request $request)
