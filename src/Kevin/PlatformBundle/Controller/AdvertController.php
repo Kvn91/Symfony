@@ -8,17 +8,12 @@ use Kevin\PlatformBundle\Entity\Advert;
 use Kevin\PlatformBundle\Entity\AdvertSkill;
 use Kevin\PlatformBundle\Entity\Image;
 use Kevin\PlatformBundle\Entity\Application;
+use Kevin\PlatformBundle\Form\AdvertEditType;
 use Kevin\PlatformBundle\Form\AdvertType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class AdvertController extends Controller
 {
@@ -68,28 +63,17 @@ class AdvertController extends Controller
     {
         $advert = new Advert();
 
-        $form = $this->get('form.factory')->createBuilder(FormType::class, $advert)
-            ->add('date',      DateType::class)
-            ->add('title',     TextType::class)
-            ->add('content',   TextareaType::class)
-            ->add('author',    TextType::class)
-            ->add('published', CheckboxType::class, array('required' => false))
-            ->add('save',      SubmitType::class)
-            ->getForm()
-        ;
+        $form = $this->createForm(AdvertType::class, $advert);
 
-        if ($request->isMethod('POST')) {
-            $form->handleRequest($request);
+        if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
 
-            if ($form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($advert);
-                $em->flush();
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($advert);
+            $em->flush();
 
-                $request->getSession()->getFlashBag()->add('notice', 'Annonce bien enregistrée.');
+            $request->getSession()->getFlashBag()->add('notice', 'Annonce bien enregistrée.');
 
-                return $this->redirectToRoute('kevin_platform_view', array('id' => $advert->getId()));
-            }
+            return $this->redirectToRoute('kevin_platform_view', array('id' => $advert->getId()));
         }
 
         return $this->render('KevinPlatformBundle:Advert:add.html.twig', array(
@@ -106,12 +90,19 @@ class AdvertController extends Controller
             throw new NotFoundHttpException("L'annonce n'existe pas");
         }
 
-        if($request->isMethod('POST')){
+        $form = $this->createForm(AdvertEditType::class, $advert);
+
+        if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
+            $em->persist($advert);
+            $em->flush();
 
             $request->getSession()->getFlashBag()->add('notice', 'Annonce modifiée !');
             return $this->redirectToRoute('kevin_platform_view', ['id' => $id]);
         }
-        return $this->render('KevinPlatformBundle:Advert:edit.html.twig', ['advert' => $advert]);
+        return $this->render('KevinPlatformBundle:Advert:edit.html.twig', [
+            'advert' => $advert,
+            'form'   => $form->createView()
+        ]);
     }
 
     public function deleteAction($id, Request $request)
