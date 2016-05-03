@@ -161,7 +161,7 @@ class Application
     }
 
     /**
-     * @ORM\PrePersist
+     * @ORM\PrePersist()
      */
     public function increase()
     {
@@ -169,7 +169,7 @@ class Application
     }
 
     /**
-     * @ORM\PreRemove
+     * @ORM\PreRemove()
      */
     public function decrease()
     {

@@ -93,7 +93,6 @@ class AdvertController extends Controller
         $form = $this->createForm(AdvertEditType::class, $advert);
 
         if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
-            $em->persist($advert);
             $em->flush();
 
             $request->getSession()->getFlashBag()->add('notice', 'Annonce modifiée !');
@@ -114,13 +113,20 @@ class AdvertController extends Controller
             throw new NotFoundHttpException("L'annonce n'existe pas");
         }
 
-        if($request->isMethod('POST')){
+        $form = $this->get('form.factory')->create();
+
+        if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
 //            Gestion de la suppression d'annonce
+            $em->remove($advert);
+            $em->flush();
 
             $request->getSession()->getFlashBag()->add('notice', 'Annonce supprimée !');
             return $this->redirectToRoute('kevin_platform_home');
         }
-        $this->render('KevinPlatformBundle:Advert:delete.html.twig', ['advert' => $advert]);
+        return $this->render('KevinPlatformBundle:Advert:delete.html.twig', [
+            'advert' => $advert,
+            'form'   => $form->createView()
+        ]);
     }
 
     public function menuAction($limit)
