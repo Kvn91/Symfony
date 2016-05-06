@@ -5,6 +5,9 @@ namespace Kevin\PlatformBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Kevin\PlatformBundle\Validator\Antiflood;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Advert
@@ -12,18 +15,19 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Table(name="advert")
  * @ORM\Entity(repositoryClass="Kevin\PlatformBundle\Repository\AdvertRepository")
  * @ORM\HasLifecycleCallbacks()
+ * @UniqueEntity(fields="title", message="Une annonce existe déjà avec ce titre.")
  */
 class Advert
 {
-    const NB_ADVERTS_PER_PAGE = 3;
-
-    /**
+    const NB_ADVERTS_PER_PAGE = 10;
+/**
      * @ORM\ManyToMany(targetEntity="Kevin\PlatformBundle\Entity\Category", cascade={"persist"})
      */
     private $categories;
 
     /**
      * @ORM\OneToOne(targetEntity="Kevin\PlatformBundle\Entity\Image", cascade={"persist"})
+     * @Assert\Valid()
      */
     private $image;
 
@@ -50,13 +54,14 @@ class Advert
      * @var \DateTime
      *
      * @ORM\Column(name="date", type="datetime")
+     * @Assert\DateTime()
      */
     private $date;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="title", type="string", length=255)
+     * @ORM\Column(name="title", type="string", length=255, unique=true)
      */
     private $title;
 
@@ -64,6 +69,7 @@ class Advert
      * @var string
      *
      * @ORM\Column(name="author", type="string", length=255)
+     * @Assert\Length(min=2)
      */
     private $author;
 
@@ -71,6 +77,8 @@ class Advert
      * @var string
      *
      * @ORM\Column(name="content", type="text")
+     * @Assert\NotBlank()
+     * @Antiflood()
      */
     private $content;
 
