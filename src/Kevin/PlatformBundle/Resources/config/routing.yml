@@ -6,7 +6,7 @@ kevin_platform_home:
         _controller: KevinPlatformBundle:Advert:index
         page:        1
     requirements:
-        page: \d*
+        page: \d+
     
 kevin_platform_view:
     path:      /advert/{id}
@@ -44,6 +44,6 @@ kevin_platform_view_slug:
         _format: html|xml
 
 kevin_platform_test:
-    path:    /test
+    path: /test
     defaults:
         _controller: KevinPlatformBundle:Advert:test

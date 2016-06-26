@@ -32,11 +32,11 @@ class AdvertController extends Controller
             throw new NotFoundHttpException('Page "'.$page.'" inexistante.');
         }
 
-        return $this->render('KevinPlatformBundle:Advert:index.html.twig', [
+        return $this->render('KevinPlatformBundle:Advert:index.html.twig', array(
             'advertsList' => $advertsList,
             'page' => $page,
             'nbPages' => $nbPages
-        ]);
+        ));
     }
 
     public function viewAction($id)
@@ -52,11 +52,11 @@ class AdvertController extends Controller
         $applicationsList = $em->getRepository('KevinPlatformBundle:Application')->findByAdvert($advert);
         $advertSkillsList = $em->getRepository('KevinPlatformBundle:AdvertSkill')->findByAdvert($advert);
 
-        return $this->render('KevinPlatformBundle:Advert:view.html.twig', [
+        return $this->render('KevinPlatformBundle:Advert:view.html.twig', array(
             'advert'            => $advert,
             'applicationsList'  => $applicationsList,
             'advertSkillsList'  => $advertSkillsList
-        ]);
+        ));
     }
 
     public function addAction(Request $request)
