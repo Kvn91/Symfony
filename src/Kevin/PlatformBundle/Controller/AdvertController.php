@@ -14,6 +14,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 class AdvertController extends Controller
 {
@@ -59,6 +61,9 @@ class AdvertController extends Controller
         ));
     }
 
+    /**
+     * @Security("has_role('ROLE_AUTEUR')")
+     */
     public function addAction(Request $request)
     {
         $advert = new Advert();
@@ -68,7 +73,6 @@ class AdvertController extends Controller
         if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
 
             $em = $this->getDoctrine()->getManager();
-            var_dump($advert->getCategories());exit;
             $em->persist($advert);
             $em->flush();
 
