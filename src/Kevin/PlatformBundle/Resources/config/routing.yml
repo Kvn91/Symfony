@@ -1,5 +1,3 @@
-# src/Kevin/PlatformBundle/Resources/config/routing.yml
-
 kevin_platform_home:
     path:      /{page}
     defaults:

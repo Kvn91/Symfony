@@ -68,6 +68,7 @@ class AdvertController extends Controller
         if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
 
             $em = $this->getDoctrine()->getManager();
+            var_dump($advert->getCategories());exit;
             $em->persist($advert);
             $em->flush();
 
@@ -89,6 +90,7 @@ class AdvertController extends Controller
         if(null === $advert){
             throw new NotFoundHttpException("L'annonce n'existe pas");
         }
+        var_dump($advert->getApplications());exit;
 
         $form = $this->createForm(AdvertEditType::class, $advert);
 
@@ -96,7 +98,9 @@ class AdvertController extends Controller
             $em->flush();
 
             $request->getSession()->getFlashBag()->add('notice', 'Annonce modifiée !');
-            return $this->redirectToRoute('kevin_platform_view', ['id' => $id]);
+            return $this->redirectToRoute('kevin_platform_view', array(
+                'id' => $id
+            ));
         }
         return $this->render('KevinPlatformBundle:Advert:edit.html.twig', [
             'advert' => $advert,
