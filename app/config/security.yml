@@ -1,24 +1,39 @@
 # To get started with security, check out the documentation:
 # http://symfony.com/doc/current/book/security.html
+# app/config/security.yml
 security:
 
-    # http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers
-    providers:
-        in_memory:
-            memory: ~
+  encoders:
+    Symfony\Component\Security\Core\User\User: plaintext
 
-    firewalls:
-        # disables authentication for assets and the profiler, adapt it according to your needs
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
+  role_hierarchy:
+    ROLE_ADMIN:       [ROLE_AUTEUR, ROLE_MODERATEUR]
+    ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
-        main:
-            anonymous: ~
-            # activate different ways to authenticate
+  providers:
+    in_memory:
+      memory:
+        users:
+          user:  { password: userpass, roles: [ 'ROLE_USER' ] }
+          admin: { password: adminpass, roles: [ 'ROLE_ADMIN' ] }
 
-            # http_basic: ~
-            # http://symfony.com/doc/current/book/security.html#a-configuring-how-your-users-will-authenticate
+  firewalls:
+    main_login:
+        # Cette expression régulière permet de prendre /login (mais pas /login_check !)
+        pattern:    ^/login$
+        anonymous:  true
+    main:
+      pattern:      ^/
+      anonymous:    false
+      provider:     in_memory
+      form_login:
+        login_path: login
+        check_path: login_check
+        default_target_path : kevin_platform_home
+      logout:
+        path:       logout
+        target:     /platform
 
-            # form_login: ~
-            # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
+  access_control:
+    #- { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
+    #- { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
