@@ -2,13 +2,5 @@ kevin_platform:
     resource: "@KevinPlatformBundle/Resources/config/routing.yml"
     prefix:   /platform
 
-login:
-    path: /login
-    defaults:
-        _controller: KevinUserBundle:Security:login
-
-login_check:
-    path: /login_check
-
-logout:
-    path: /logout
+fos_user_security:
+    resource: "@FOSUserBundle/Resources/config/routing/all.xml"
