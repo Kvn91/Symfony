@@ -41,6 +41,11 @@ class AdvertType extends AbstractType
                     return $repository->getLikeQueryBuilder($pattern);
                 }
             ))
+            ->add('applications', CollectionType::class, array(
+                'entry_type'   => ApplicationType::class,
+                'allow_add'    => true,
+                'allow_delete' => true,
+            ))
             ->add('save',      SubmitType::class);
 
         $builder->addEventListener(

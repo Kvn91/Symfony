@@ -14,6 +14,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 class AdvertController extends Controller
 {
@@ -59,6 +61,9 @@ class AdvertController extends Controller
         ));
     }
 
+    /**
+     * @Security("has_role('ROLE_AUTEUR')")
+     */
     public function addAction(Request $request)
     {
         $advert = new Advert();
@@ -89,6 +94,7 @@ class AdvertController extends Controller
         if(null === $advert){
             throw new NotFoundHttpException("L'annonce n'existe pas");
         }
+        var_dump($advert->getApplications());exit;
 
         $form = $this->createForm(AdvertEditType::class, $advert);
 
@@ -96,7 +102,9 @@ class AdvertController extends Controller
             $em->flush();
 
             $request->getSession()->getFlashBag()->add('notice', 'Annonce modifiée !');
-            return $this->redirectToRoute('kevin_platform_view', ['id' => $id]);
+            return $this->redirectToRoute('kevin_platform_view', array(
+                'id' => $id
+            ));
         }
         return $this->render('KevinPlatformBundle:Advert:edit.html.twig', [
             'advert' => $advert,

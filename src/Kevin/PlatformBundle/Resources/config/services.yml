@@ -1,9 +1,22 @@
 services:
     kevin_platform.antispam:
         class:     Kevin\PlatformBundle\Antispam\OCAntispam
-        arguments: ['@mailer', %locale%, 50]
+        arguments:
+            - '@mailer'
+            - %locale%
+            - 50
+
+    kevin_platform.twig.antispam_extension:
+        class: Kevin\PlatformBundle\Twig\AntispamExtension
+        arguments:
+            - '@kevin_platform.antispam'
+        tags:
+            - { name: twig.extension }
+
     kevin_platform.validator.antiflood:
         class:     Kevin\PlatformBundle\Validator\AntifloodValidator
-        arguments: ['@request_stack', '@doctrine.orm.entity_manager']
+        arguments:
+            - '@request_stack'
+            - '@doctrine.orm.entity_manager'
         tags:
             - { name: validator.constraint_validator, alias: kevin_platform_antiflood }
